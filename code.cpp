@@ -49,7 +49,7 @@ void nullifyVisitedArray()
     return;
 }
 
-// Function to carry out depth wise traversel in the graph
+// Function to carry out depth-first-search in the graph
 void traverseDFS(int node, bool isPrint)
 {
     visited[node] = 1;
@@ -65,6 +65,15 @@ void traverseDFS(int node, bool isPrint)
     return;
 }
 
+// Depth-First-Search
+void DFS(){
+    for(auto it : vertices){
+        if(visited[it]==0){
+            traverseDFS(it, true);
+        }
+    }
+}
+
 // Function that finds and returns the number of connected components in the graph
 int findNumberOfConnectedComponents()
 {
@@ -76,6 +85,11 @@ int findNumberOfConnectedComponents()
         }
     }
     return count;
+}
+
+// Function to determine if a graph is connected
+bool isConnected(){
+    return true ? findNumberOfConnectedComponents() == 1 : false;
 }
 
 int main()
@@ -108,6 +122,10 @@ int main()
     auto sourcePointer = vertices.begin();
     int source = *sourcePointer;
 
-    // traverseDFS(source, true);
+    // DFS();
     // cout<<"The number of connected components are "<< findNumberOfConnectedComponents();
+    // if(isConnected())
+    //     cout<<"The graph is connected";
+    // else
+    //     cout<<"The graph is not connected";
 }
