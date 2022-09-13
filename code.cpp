@@ -6,39 +6,76 @@ using namespace std;
 
 #define mod 1000000007
 #define ll long long int
+#define MAX_NODE 20
+#define MAX_NO_OF_VERTICES 10
 
 vector<vector<int>> adjacencyList(101);
 set<int> vertices;
 set<pair<int, int>> edges;
+vector<int> visited;
 
 // generate a random Graph
 void generateRandomGraph()
 {
-    int v = (rand() % (10 - 1 + 1)) + 1;
-    int e = (rand() % ((v-1) - 1 + 1)) + 1;
+    int v = (rand() % (MAX_NO_OF_VERTICES - 1 + 1)) + 1;
+    int e = (rand() % ((((v - 1) * (v - 2)) / 2) - 1 + 1)) + 1;
     for (int i = 0; i < v; i++)
     {
-        int x = (rand() % (20 - 1 + 1)) + 1;
-        vertices.insert(x);
+        int x = (rand() % (MAX_NODE - 1 + 1)) + 1;
+        if (vertices.count(x) == 0)
+            vertices.insert(x);
+        else
+            i--;
     }
     int count = 0;
-    for (auto currentVertex : vertices)
+    while (count < e)
     {
-        if (count == e)
-            break;
-        for (auto newVertex : vertices)
+        int firstVertex = (rand() % (MAX_NODE - 1 + 1)) + 1;
+        int secondVertex = (rand() % (MAX_NODE - 1 + 1)) + 1;
+        if (firstVertex != secondVertex && vertices.count(firstVertex) != 0 && vertices.count(secondVertex) != 0 && edges.count({firstVertex, secondVertex}) == 0)
         {
-            if (count == e)
-                break;
-            if (newVertex != currentVertex && edges.count({newVertex, currentVertex})==0)
-            {
-                edges.insert({currentVertex, newVertex});
-                adjacencyList[currentVertex].push_back(newVertex);
-                count++;
-            }
+            edges.insert({firstVertex, secondVertex});
+            adjacencyList[firstVertex].push_back(secondVertex);
+            count++;
         }
     }
     return;
+}
+
+// nullify visited array
+void nullifyVisitedArray()
+{
+    visited.resize(MAX_NODE + 1, 0);
+    return;
+}
+
+// Function to carry out depth wise traversel in the graph
+void traverseDFS(int node, bool isPrint)
+{
+    visited[node] = 1;
+    if (isPrint)
+        cout << node << " ";
+    for (int i = 0; i < adjacencyList[node].size(); i++)
+    {
+        if (visited[adjacencyList[node][i]] == 0)
+        {
+            traverseDFS(adjacencyList[node][i], isPrint);
+        }
+    }
+    return;
+}
+
+// Function that finds and returns the number of connected components in the graph
+int findNumberOfConnectedComponents()
+{
+    int count=0;
+    for(auto it : vertices){
+        if(visited[it]==0){
+            traverseDFS(it, false);
+            count++;
+        }
+    }
+    return count;
 }
 
 int main()
@@ -50,13 +87,27 @@ int main()
 
     srand(time(0));
 
-    generateRandomGraph();
+    generateRandomGraph(); // generate random set of vertices and edges
+    nullifyVisitedArray(); // nullify the visited array (no vertex is visited)
 
     // print the graph
-    cout<<"The graph looks as :\n";
-    for(auto it : vertices){       
-        for(int i=0;i<adjacencyList[it].size();i++){
-            cout<<it<<" --> "<<adjacencyList[it][i]<<"\n";
+    cout << "The graph looks as :\n";
+    cout<<"The set of vertices are : \n";
+    for(auto it : vertices){
+        cout<<it<<"\n";
+    }
+    cout<<"The set of edges are: \n";
+    for (auto it : vertices)
+    {
+        for (int i = 0; i < adjacencyList[it].size(); i++)
+        {
+            cout << it << " --> " << adjacencyList[it][i] << "\n";
         }
     }
+
+    auto sourcePointer = vertices.begin();
+    int source = *sourcePointer;
+
+    // traverseDFS(source, true);
+    // cout<<"The number of connected components are "<< findNumberOfConnectedComponents();
 }
