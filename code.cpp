@@ -6,13 +6,15 @@ using namespace std;
 
 #define mod 1000000007
 #define ll long long int
-#define MAX_NODE 20
-#define MAX_NO_OF_VERTICES 10
+#define MAX_NODE 20 // maximum value of a node
+#define MAX_NO_OF_VERTICES 10 // maximum number of nodes
 
-vector<vector<int>> adjacencyList(101);
-set<int> vertices;
-set<pair<int, int>> edges;
-vector<int> visited;
+vector<vector<int>> adjacencyList(101); // adjacency list of the graph G
+set<int> vertices; // set of vertices V(G)
+set<pair<int, int>> edges; // set of edges E(G)
+vector<int> visited; // array to store if a node is visited or not (0 represents not visited while 1 represents visited)
+vector<int> color; // array to store the color of every node in the graph
+bool isBipartite; // to store if the graph is bipartite
 
 // generate a random Graph
 void generateRandomGraph()
@@ -49,6 +51,13 @@ void nullifyVisitedArray()
     return;
 }
 
+// nullify color array
+void nullifyColorArray()
+{
+    color.resize(MAX_NODE + 1, 0);
+    return;
+}
+
 // Function to carry out depth-first-search in the graph
 void traverseDFS(int node, bool isPrint)
 {
@@ -66,9 +75,12 @@ void traverseDFS(int node, bool isPrint)
 }
 
 // Depth-First-Search
-void DFS(){
-    for(auto it : vertices){
-        if(visited[it]==0){
+void DFS()
+{
+    for (auto it : vertices)
+    {
+        if (visited[it] == 0)
+        {
             traverseDFS(it, true);
         }
     }
@@ -77,9 +89,11 @@ void DFS(){
 // Function that finds and returns the number of connected components in the graph
 int findNumberOfConnectedComponents()
 {
-    int count=0;
-    for(auto it : vertices){
-        if(visited[it]==0){
+    int count = 0;
+    for (auto it : vertices)
+    {
+        if (visited[it] == 0)
+        {
             traverseDFS(it, false);
             count++;
         }
@@ -88,8 +102,29 @@ int findNumberOfConnectedComponents()
 }
 
 // Function to determine if a graph is connected
-bool isConnected(){
+bool isConnected()
+{
     return true ? findNumberOfConnectedComponents() == 1 : false;
+}
+
+void checkBipartite(int node)
+{
+    visited[node] = 1;
+    for (int i = 0; i < adjacencyList[node].size(); i++)
+    {
+        if (visited[adjacencyList[node][1]] == 0)
+        {
+            color[adjacencyList[node][i]] = 1 ? color[node] == 0 : 1;
+            checkBipartite(i);
+        }
+        else
+        {
+            int chosenColor = 0 ? color[node] == 1 : 1;
+            if (color[adjacencyList[node][i]] ^ chosenColor == 1)
+                isBipartite = false;
+        }
+    }
+    return;
 }
 
 int main()
@@ -103,14 +138,16 @@ int main()
 
     generateRandomGraph(); // generate random set of vertices and edges
     nullifyVisitedArray(); // nullify the visited array (no vertex is visited)
+    nullifyColorArray();   // nullify the color array (no vertex is colored)
 
     // print the graph
     cout << "The graph looks as :\n";
-    cout<<"The set of vertices are : \n";
-    for(auto it : vertices){
-        cout<<it<<"\n";
+    cout << "The set of vertices are : \n";
+    for (auto it : vertices)
+    {
+        cout << it << "\n";
     }
-    cout<<"The set of edges are: \n";
+    cout << "The set of edges are: \n";
     for (auto it : vertices)
     {
         for (int i = 0; i < adjacencyList[it].size(); i++)
@@ -122,10 +159,21 @@ int main()
     auto sourcePointer = vertices.begin();
     int source = *sourcePointer;
 
+    // For DFS Traversal
     // DFS();
+
+    // To count the number of connected components
     // cout<<"The number of connected components are "<< findNumberOfConnectedComponents();
-    // if(isConnected())
-    //     cout<<"The graph is connected";
-    // else
-    //     cout<<"The graph is not connected";
+
+    // To check if the graph is connected
+    // isConnected() ? cout<<"The graph is connected" : cout<<"The graph is disconnected";
+
+    // To check if the graph is Bipartite
+    // isBipartite = true;
+    // for (auto it : vertices)
+    // {
+    //     if (visited[it] == 0)
+    //         checkBipartite(it);
+    // }
+    // isBipartite ? cout<<"The graph is bipartite" : cout<<"The graph is not bipartite";
 }
