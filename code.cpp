@@ -107,6 +107,7 @@ bool isConnected()
     return true ? findNumberOfConnectedComponents() == 1 : false;
 }
 
+// Function to check if a graph is bipartite
 void checkBipartite(int node)
 {
     visited[node] = 1;
@@ -129,7 +130,6 @@ void checkBipartite(int node)
 
 int main()
 {
-
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
     cout.tie(NULL);
