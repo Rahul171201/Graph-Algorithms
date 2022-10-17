@@ -15,6 +15,7 @@ set<pair<int, int>> edges; // set of edges E(G)
 vector<int> visited; // array to store if a node is visited or not (0 represents not visited while 1 represents visited)
 vector<int> color; // array to store the color of every node in the graph
 bool isBipartite; // to store if the graph is bipartite
+int n_of_components; // to store the number of components in a single connected component of the graph
 
 // generate a random Graph
 void generateRandomGraph()
@@ -48,6 +49,9 @@ void generateRandomGraph()
 void nullifyVisitedArray()
 {
     visited.resize(MAX_NODE + 1, 0);
+    for(int i=0;i<MAX_NODE+1;i++){
+        visited[i] = 0;
+    }
     return;
 }
 
@@ -55,6 +59,9 @@ void nullifyVisitedArray()
 void nullifyColorArray()
 {
     color.resize(MAX_NODE + 1, 0);
+    for(int i=0;i<MAX_NODE+1;i++){
+        color[i] = 0;
+    }
     return;
 }
 
@@ -62,14 +69,13 @@ void nullifyColorArray()
 void traverseDFS(int node, bool isPrint)
 {
     visited[node] = 1;
+    n_of_components++;
     if (isPrint)
         cout << node << " ";
     for (int i = 0; i < adjacencyList[node].size(); i++)
     {
         if (visited[adjacencyList[node][i]] == 0)
-        {
             traverseDFS(adjacencyList[node][i], isPrint);
-        }
     }
     return;
 }
@@ -105,6 +111,22 @@ int findNumberOfConnectedComponents()
 bool isConnected()
 {
     return true ? findNumberOfConnectedComponents() == 1 : false;
+}
+
+// Function to calculate the size of the largest component
+int sizeOfLargestComponent(){
+    nullifyVisitedArray();
+    int max_size = 0;
+    for (auto it : vertices)
+    {
+        n_of_components = 0;
+        if (visited[it] == 0)
+        {
+            traverseDFS(it, false);
+            max_size = max(max_size, n_of_components);
+        }
+    }
+    return max_size;
 }
 
 // Function to check if a graph is bipartite
@@ -163,10 +185,13 @@ int main()
     // DFS();
 
     // To count the number of connected components
-    // cout<<"The number of connected components are "<< findNumberOfConnectedComponents();
+    // cout<<"The number of connected components are\n"<< findNumberOfConnectedComponents();
 
     // To check if the graph is connected
-    // isConnected() ? cout<<"The graph is connected" : cout<<"The graph is disconnected";
+    // isConnected() ? cout<<"The graph is connected\n" : cout<<"The graph is disconnected\n";
+
+    // To get the size of the largest connected component
+    cout<<"The size of the largest component = "<<sizeOfLargestComponent()<<"\n";
 
     // To check if the graph is Bipartite
     // isBipartite = true;
@@ -175,5 +200,5 @@ int main()
     //     if (visited[it] == 0)
     //         checkBipartite(it);
     // }
-    // isBipartite ? cout<<"The graph is bipartite" : cout<<"The graph is not bipartite";
+    // isBipartite ? cout<<"The graph is bipartite\n" : cout<<"The graph is not bipartite\n";
 }
