@@ -23,7 +23,8 @@ bool isEulerian = false;
 int no_of_eulerian_paths = 0;
 int number_of_vertices;
 int number_of_edges;
-
+vector<int> parent;
+vector<int> rank_parent;
 
 // generate a random Graph
 void generateRandomGraph()
@@ -71,6 +72,7 @@ void readGraphFromFile(vector<vector<int>> &adjacencyMatrix)
         cout << u << " " << v << " " << w << "\n";
         adjacencyList[u].push_back(v);
         adjacencyList[v].push_back(u);
+        edges.insert({u, v});
         adjacencyMatrix[u][v] = w;
         adjacencyMatrix[v][u] = w;
         if (vertices.count(u) == 0)
@@ -87,6 +89,19 @@ void nullifyVisitedArray()
     for (int i = 0; i < MAX_NODE + 1; i++)
     {
         visited[i] = 0;
+    }
+    return;
+}
+
+// nullify parent array
+void nullifyParentArray()
+{
+    parent.resize(101, -1);
+    rank_parent.resize(101, 0);
+    for (int i = 0; i <= 100; i++)
+    {
+        parent[i] = -1;
+        rank_parent[i] = i;
     }
     return;
 }
@@ -232,6 +247,10 @@ void eulerianTraversal(int start_node, int node)
 // Function to find the number of Euler paths
 int getNumberOfEulerPaths()
 {
+    if (!isConnected())
+    {
+        return 0;
+    }
     no_of_eulerian_paths = 0;
     for (auto it : vertices)
     {
@@ -243,6 +262,10 @@ int getNumberOfEulerPaths()
 
 bool checkIfEulerian()
 {
+    if (!isConnected())
+    {
+        return false;
+    }
     for (auto it : vertices)
     {
         no_of_edges_visited = 0;
@@ -251,12 +274,40 @@ bool checkIfEulerian()
     return isEulerian;
 }
 
-vector<pair<pair<int, int>, int>> sort_edges()
+vector<pair<int, pair<int, int>>> sort_edges(vector<vector<int>> &adjacencyMatrix)
 {
+    vector<pair<int, pair<int, int>>> ans;
+    for (auto it : edges)
+    {
+        ans.push_back({adjacencyMatrix[it.first][it.second], {it.first, it.second}});
+    }
+    sort(ans.begin(), ans.end());
+    return ans;
 }
 
-int Kruskal_MST()
+int Kruskal_MST(vector<vector<int>> &adjacencyMatrix)
 {
+    // if(!isConnected()){
+    //     return -1;
+    // }
+    vector<pair<int, pair<int, int>>> res = sort_edges(adjacencyMatrix);
+    int ans = 0;
+    set<int> parsed_vertices;
+    for (int i = 0; i < res.size(); i++)
+    {
+        if (vertices.size() == parsed_vertices.size())
+            break;
+
+        if (rank_parent[res[i].second.first] != rank_parent[res[i].second.second] || (rank_parent[res[i].second.first] == -1 && rank_parent[res[i].second.second] == -1))
+        {
+            parent[res[i].second.first] = res[i].second.second;
+            rank_parent[res[i].second.first] = rank_parent[res[i].second.second];
+            ans = ans + res[i].first;
+            parsed_vertices.insert(res[i].second.first);
+            parsed_vertices.insert(res[i].second.second);
+        }
+    }
+    return ans;
 }
 
 int main()
@@ -268,12 +319,14 @@ int main()
     // srand(time(0));
 
     vector<vector<int>> adjacencyMatrix(101, vector<int>(101, -1));
-    cout << "hmm";
+    // reading graph from input file
     readGraphFromFile(adjacencyMatrix);
-    // generateRandomGraph(); // generate random set of vertices and edges
+    // generate random set of vertices and edges
+    // generateRandomGraph(); 
     nullifyVisitedArray(); // nullify the visited array (no vertex is visited)
     nullifyColorArray();   // nullify the color array (no vertex is colored)
     nullifyEdgesMap();     // nullify the edges map (no edge is visited)
+    nullifyParentArray();
     no_of_edges_visited = 0;
     final_point = 0;
 
@@ -285,12 +338,9 @@ int main()
         cout << it << "\n";
     }
     cout << "The set of edges are: \n";
-    for (auto it : vertices)
+    for (auto it : edges)
     {
-        for (int i = 0; i < adjacencyList[it].size(); i++)
-        {
-            cout << it << " --> " << adjacencyList[it][i] << " with weight = " << adjacencyMatrix[it][adjacencyList[it][i]] << "\n";
-        }
+        cout << it.first << " --> " << it.second << " with weight = " << adjacencyMatrix[it.first][it.second] << "\n";
     }
 
     auto sourcePointer = vertices.begin();
@@ -322,4 +372,7 @@ int main()
 
     // To check if the graph is Eulerian
     isEulerian ? cout << "The graph is eulerian\n" : cout << "The graph is not eulerian\n";
+
+    // MST using Kruskal's Algorithm
+    cout << "The MST Cost using Kruskal is equal to  = " << Kruskal_MST(adjacencyMatrix) << "\n";
 }
