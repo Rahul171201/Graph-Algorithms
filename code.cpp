@@ -6,16 +6,21 @@ using namespace std;
 
 #define mod 1000000007
 #define ll long long int
-#define MAX_NODE 20 // maximum value of a node
+#define MAX_NODE 20           // maximum value of a node
 #define MAX_NO_OF_VERTICES 10 // maximum number of nodes
 
-vector<vector<int>> adjacencyList(101); // adjacency list of the graph G
-set<int> vertices; // set of vertices V(G)
-set<pair<int, int>> edges; // set of edges E(G)
-vector<int> visited; // array to store if a node is visited or not (0 represents not visited while 1 represents visited)
-vector<int> color; // array to store the color of every node in the graph
-bool isBipartite; // to store if the graph is bipartite
-int n_of_components; // to store the number of components in a single connected component of the graph
+vector<vector<int>> adjacencyList(MAX_NO_OF_VERTICES); // adjacency list of the graph G
+set<int> vertices;                                     // set of vertices V(G)
+set<pair<int, int>> edges;                             // set of edges E(G)
+vector<int> visited;                                   // array to store if a node is visited or not (0 represents not visited while 1 represents visited)
+vector<int> color;                                     // array to store the color of every node in the graph
+bool isBipartite;                                      // to store if the graph is bipartite
+int n_of_components;                                   // to store the number of components in a single connected component of the graph
+int no_of_edges_visited;                               // to keep track of number of edges visited
+int final_point;                                       // to keep track of any point at any point of traversal
+map<pair<int, int>, int> visited_edges;                // map to store if an edge is visited or not
+bool isEulerian = false;
+int no_of_eulerian_paths = 0;
 
 // generate a random Graph
 void generateRandomGraph()
@@ -49,7 +54,8 @@ void generateRandomGraph()
 void nullifyVisitedArray()
 {
     visited.resize(MAX_NODE + 1, 0);
-    for(int i=0;i<MAX_NODE+1;i++){
+    for (int i = 0; i < MAX_NODE + 1; i++)
+    {
         visited[i] = 0;
     }
     return;
@@ -59,10 +65,23 @@ void nullifyVisitedArray()
 void nullifyColorArray()
 {
     color.resize(MAX_NODE + 1, 0);
-    for(int i=0;i<MAX_NODE+1;i++){
+    for (int i = 0; i < MAX_NODE + 1; i++)
+    {
         color[i] = 0;
     }
     return;
+}
+
+// nullify edges map
+void nullifyEdgesMap()
+{
+    for (auto it : vertices)
+    {
+        for (auto jt : adjacencyList[it])
+        {
+            visited_edges[{it, jt}] = 0;
+        }
+    }
 }
 
 // Function to carry out depth-first-search in the graph
@@ -114,7 +133,8 @@ bool isConnected()
 }
 
 // Function to calculate the size of the largest component
-int sizeOfLargestComponent(){
+int sizeOfLargestComponent()
+{
     nullifyVisitedArray();
     int max_size = 0;
     for (auto it : vertices)
@@ -150,6 +170,49 @@ void checkBipartite(int node)
     return;
 }
 
+// Function to apply eulerian traversel
+void eulerianTraversal(int start_node, int node)
+{
+    final_point = node;
+    if(no_of_edges_visited == edges.size()){
+        no_of_eulerian_paths++;
+    }
+    if (final_point == start_node && no_of_edges_visited == edges.size())
+    {
+        isEulerian = true;
+    }
+    for (auto it : adjacencyList[node])
+    {
+        if (visited_edges[{it, node}] == 0)
+        {
+            visited_edges[{it, node}] = 1;
+            visited_edges[{node, it}] = 1;
+            no_of_edges_visited++;
+
+            eulerianTraversal(start_node, node);
+
+            visited_edges[{it, node}] = 0;
+            visited_edges[{node, it}] = 0;
+            no_of_edges_visited--;
+        }
+    }
+}
+
+// Function to find the number of Euler paths
+int getNumberOfEulerPaths()
+{
+    no_of_eulerian_paths = 0;
+    for (auto it : vertices)
+    {
+        no_of_edges_visited = 0;
+       
+        eulerianTraversal(it, it);
+    }
+    return no_of_eulerian_paths;
+}
+
+
+
 int main()
 {
     ios_base::sync_with_stdio(false);
@@ -161,6 +224,9 @@ int main()
     generateRandomGraph(); // generate random set of vertices and edges
     nullifyVisitedArray(); // nullify the visited array (no vertex is visited)
     nullifyColorArray();   // nullify the color array (no vertex is colored)
+    nullifyEdgesMap();     // nullify the edges map (no edge is visited)
+    no_of_edges_visited = 0;
+    final_point = 0;
 
     // print the graph
     cout << "The graph looks as :\n";
@@ -191,7 +257,7 @@ int main()
     // isConnected() ? cout<<"The graph is connected\n" : cout<<"The graph is disconnected\n";
 
     // To get the size of the largest connected component
-    cout<<"The size of the largest component = "<<sizeOfLargestComponent()<<"\n";
+    cout << "The size of the largest component = " << sizeOfLargestComponent() << "\n";
 
     // To check if the graph is Bipartite
     // isBipartite = true;
@@ -201,4 +267,6 @@ int main()
     //         checkBipartite(it);
     // }
     // isBipartite ? cout<<"The graph is bipartite\n" : cout<<"The graph is not bipartite\n";
+
+    // To find number of Euler paths
 }
