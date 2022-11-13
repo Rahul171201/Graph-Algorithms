@@ -25,7 +25,7 @@ int no_of_eulerian_paths = 0;
 // generate a random Graph
 void generateRandomGraph()
 {
-    int v = (rand() % (MAX_NO_OF_VERTICES - 1 + 1)) + 1;
+    int v = (rand() % (MAX_NO_OF_VERTICES - 2 + 1)) + 2;
     int e = (rand() % ((((v - 1) * (v - 2)) / 2) - 1 + 1)) + 1;
     for (int i = 0; i < v; i++)
     {
@@ -211,7 +211,14 @@ int getNumberOfEulerPaths()
     return no_of_eulerian_paths;
 }
 
-
+bool checkIfEulerian(){
+    for (auto it : vertices)
+    {
+        no_of_edges_visited = 0;
+        eulerianTraversal(it, it);
+    }
+    return isEulerian;
+}
 
 int main()
 {
@@ -221,7 +228,7 @@ int main()
 
     srand(time(0));
 
-    generateRandomGraph(); // generate random set of vertices and edges
+    //generateRandomGraph(); // generate random set of vertices and edges
     nullifyVisitedArray(); // nullify the visited array (no vertex is visited)
     nullifyColorArray();   // nullify the color array (no vertex is colored)
     nullifyEdgesMap();     // nullify the edges map (no edge is visited)
@@ -257,7 +264,7 @@ int main()
     // isConnected() ? cout<<"The graph is connected\n" : cout<<"The graph is disconnected\n";
 
     // To get the size of the largest connected component
-    cout << "The size of the largest component = " << sizeOfLargestComponent() << "\n";
+    //cout << "The size of the largest component = " << sizeOfLargestComponent() << "\n";
 
     // To check if the graph is Bipartite
     // isBipartite = true;
@@ -269,4 +276,8 @@ int main()
     // isBipartite ? cout<<"The graph is bipartite\n" : cout<<"The graph is not bipartite\n";
 
     // To find number of Euler paths
+    cout<<"The number of eularian paths = "<<getNumberOfEulerPaths()<<"\n";
+
+    // To check if the graph is Eulerian
+    isEulerian ? cout<<"The graph is eulerian\n" : cout<<"The graph is not eulerian\n";
 }
