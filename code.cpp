@@ -9,18 +9,20 @@ using namespace std;
 #define MAX_NODE 20           // maximum value of a node
 #define MAX_NO_OF_VERTICES 10 // maximum number of nodes
 
-vector<vector<int>> adjacencyList(MAX_NO_OF_VERTICES); // adjacency list of the graph G
-set<int> vertices;                                     // set of vertices V(G)
-set<pair<int, int>> edges;                             // set of edges E(G)
-vector<int> visited;                                   // array to store if a node is visited or not (0 represents not visited while 1 represents visited)
-vector<int> color;                                     // array to store the color of every node in the graph
-bool isBipartite;                                      // to store if the graph is bipartite
-int n_of_components;                                   // to store the number of components in a single connected component of the graph
-int no_of_edges_visited;                               // to keep track of number of edges visited
-int final_point;                                       // to keep track of any point at any point of traversal
-map<pair<int, int>, int> visited_edges;                // map to store if an edge is visited or not
+vector<vector<int>> adjacencyList(101); // adjacency list of the graph G
+set<int> vertices;                      // set of vertices V(G)
+set<pair<int, int>> edges;              // set of edges E(G)
+vector<int> visited;                    // array to store if a node is visited or not (0 represents not visited while 1 represents visited)
+vector<int> color;                      // array to store the color of every node in the graph
+bool isBipartite;                       // to store if the graph is bipartite
+int n_of_components;                    // to store the number of components in a single connected component of the graph
+int no_of_edges_visited;                // to keep track of number of edges visited
+int final_point;                        // to keep track of any point at any point of traversal
+map<pair<int, int>, int> visited_edges; // map to store if an edge is visited or not
 bool isEulerian = false;
 int no_of_eulerian_paths = 0;
+int number_of_vertices;
+int number_of_edges;
 
 // generate a random Graph
 void generateRandomGraph()
@@ -48,6 +50,28 @@ void generateRandomGraph()
         }
     }
     return;
+}
+
+// Function to read graph from file
+void readGraphFromFile()
+{
+    ifstream file("input.txt");
+
+    file >> number_of_vertices;
+    file >> number_of_edges;
+    cout << number_of_vertices << " " << number_of_edges << "\n";
+    int temp;
+    while (file >> temp)
+    {
+        int v;
+        file >> v;
+        adjacencyList[temp].push_back(v);
+        adjacencyList[v].push_back(temp);
+        if (vertices.count(temp) == 0)
+            vertices.insert(temp);
+        if (vertices.count(v) == 0)
+            vertices.insert(v);
+    }
 }
 
 // nullify visited array
@@ -174,7 +198,8 @@ void checkBipartite(int node)
 void eulerianTraversal(int start_node, int node)
 {
     final_point = node;
-    if(no_of_edges_visited == edges.size()){
+    if (no_of_edges_visited == edges.size())
+    {
         no_of_eulerian_paths++;
     }
     if (final_point == start_node && no_of_edges_visited == edges.size())
@@ -205,13 +230,13 @@ int getNumberOfEulerPaths()
     for (auto it : vertices)
     {
         no_of_edges_visited = 0;
-       
         eulerianTraversal(it, it);
     }
     return no_of_eulerian_paths;
 }
 
-bool checkIfEulerian(){
+bool checkIfEulerian()
+{
     for (auto it : vertices)
     {
         no_of_edges_visited = 0;
@@ -226,8 +251,9 @@ int main()
     cin.tie(NULL);
     cout.tie(NULL);
 
-    srand(time(0));
+    // srand(time(0));
 
+    readGraphFromFile();
     //generateRandomGraph(); // generate random set of vertices and edges
     nullifyVisitedArray(); // nullify the visited array (no vertex is visited)
     nullifyColorArray();   // nullify the color array (no vertex is colored)
@@ -264,7 +290,7 @@ int main()
     // isConnected() ? cout<<"The graph is connected\n" : cout<<"The graph is disconnected\n";
 
     // To get the size of the largest connected component
-    //cout << "The size of the largest component = " << sizeOfLargestComponent() << "\n";
+    // cout << "The size of the largest component = " << sizeOfLargestComponent() << "\n";
 
     // To check if the graph is Bipartite
     // isBipartite = true;
@@ -276,8 +302,8 @@ int main()
     // isBipartite ? cout<<"The graph is bipartite\n" : cout<<"The graph is not bipartite\n";
 
     // To find number of Euler paths
-    cout<<"The number of eularian paths = "<<getNumberOfEulerPaths()<<"\n";
+    cout << "The number of eularian paths = " << getNumberOfEulerPaths() << "\n";
 
     // To check if the graph is Eulerian
-    isEulerian ? cout<<"The graph is eulerian\n" : cout<<"The graph is not eulerian\n";
+    isEulerian ? cout << "The graph is eulerian\n" : cout << "The graph is not eulerian\n";
 }
