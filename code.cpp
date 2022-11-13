@@ -24,6 +24,7 @@ int no_of_eulerian_paths = 0;
 int number_of_vertices;
 int number_of_edges;
 
+
 // generate a random Graph
 void generateRandomGraph()
 {
@@ -53,22 +54,27 @@ void generateRandomGraph()
 }
 
 // Function to read graph from file
-void readGraphFromFile()
+void readGraphFromFile(vector<vector<int>> &adjacencyMatrix)
 {
     ifstream file("input.txt");
 
     file >> number_of_vertices;
     file >> number_of_edges;
     cout << number_of_vertices << " " << number_of_edges << "\n";
-    int temp;
-    while (file >> temp)
+
+    for (int i = 0; i < number_of_edges; i++)
     {
-        int v;
+        int u, v, w;
+        file >> u;
         file >> v;
-        adjacencyList[temp].push_back(v);
-        adjacencyList[v].push_back(temp);
-        if (vertices.count(temp) == 0)
-            vertices.insert(temp);
+        file >> w;
+        cout << u << " " << v << " " << w << "\n";
+        adjacencyList[u].push_back(v);
+        adjacencyList[v].push_back(u);
+        adjacencyMatrix[u][v] = w;
+        adjacencyMatrix[v][u] = w;
+        if (vertices.count(u) == 0)
+            vertices.insert(u);
         if (vertices.count(v) == 0)
             vertices.insert(v);
     }
@@ -245,6 +251,14 @@ bool checkIfEulerian()
     return isEulerian;
 }
 
+vector<pair<pair<int, int>, int>> sort_edges()
+{
+}
+
+int Kruskal_MST()
+{
+}
+
 int main()
 {
     ios_base::sync_with_stdio(false);
@@ -253,8 +267,10 @@ int main()
 
     // srand(time(0));
 
-    readGraphFromFile();
-    //generateRandomGraph(); // generate random set of vertices and edges
+    vector<vector<int>> adjacencyMatrix(101, vector<int>(101, -1));
+    cout << "hmm";
+    readGraphFromFile(adjacencyMatrix);
+    // generateRandomGraph(); // generate random set of vertices and edges
     nullifyVisitedArray(); // nullify the visited array (no vertex is visited)
     nullifyColorArray();   // nullify the color array (no vertex is colored)
     nullifyEdgesMap();     // nullify the edges map (no edge is visited)
@@ -273,7 +289,7 @@ int main()
     {
         for (int i = 0; i < adjacencyList[it].size(); i++)
         {
-            cout << it << " --> " << adjacencyList[it][i] << "\n";
+            cout << it << " --> " << adjacencyList[it][i] << " with weight = " << adjacencyMatrix[it][adjacencyList[it][i]] << "\n";
         }
     }
 
